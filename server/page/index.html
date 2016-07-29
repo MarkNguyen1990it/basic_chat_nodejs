@@ -57,16 +57,16 @@ a {
 
 .msgln { margin:0 0 2px 0; }
 </style>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="www.marknguyen.com">
 
 <head>
     <title>Chat - Customer Module</title>
 
 </head>
-<script type="text/javascript" src="http://10.20.17.62:8080/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="http://localhost:9001/socket.io/socket.io.js"></script>
 <div id="wrapper">
     <div id="menu">
-        <p class="welcome">Welcome,<input name="name" type="text" id="name" size="63" /><b></b></p>        
+        <p class="welcome">Welcome,<input name="name" type="text" id="name" size="63" /><b></b></p>
         <div style="clear:both"></div>
     </div>
 
@@ -87,7 +87,7 @@ a {
         }
       });
     });
-    var socket=io.connect('http://10.20.17.62:8080');
+    var socket=io.connect('http://localhost:9001');
     function sendChat() {
       var infomation={}
       infomation["name"]=$("#name").val();

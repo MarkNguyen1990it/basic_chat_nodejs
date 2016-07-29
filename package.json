@@ -1,0 +1,13 @@
+{
+  "name": "basic_chat_nodejs",
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/index.js"
+  },
+  "dependencies": {
+    "express": "^4.14.0",
+    "socket.io": "^1.4.8"
+  },
+  "devDependencies": {}
+}
