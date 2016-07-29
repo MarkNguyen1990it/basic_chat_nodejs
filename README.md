@@ -6,6 +6,6 @@ npm
 git
 
 #### Installation:  
-    > sudo npm install socket.io
+    > sudo npm install
     > npm run start  || node server/index.js
     > Link : localhost:9000
