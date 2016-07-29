@@ -22,13 +22,13 @@ a {
 #wrapper, #loginform {
   margin:0 auto;
   padding-bottom:25px;
-  background:#EBF4FB;
+  background:#E1E8EF;
   width:504px;
-  border:1px solid #ACD8F0; }
+  border:1px solid #ccc; }
 
 #loginform { padding-top:18px; }
 
-  #loginform p { margin: 5px; }
+#loginform p { margin: 5px; }
 
 #chatbox {
   text-align:left;
@@ -38,18 +38,27 @@ a {
   background:#fff;
   height:270px;
   width:430px;
-  border:1px solid #ACD8F0;
+  border:1px solid #ccc;
   overflow:auto; }
 
 #usermsg {
   width:395px;
-  border:1px solid #ACD8F0; }
+  border:1px solid #ccc; }
 
 #submit { width: 60px; }
 
 .error { color: #ff0000; }
 
 #menu { padding:12.5px 25px 12.5px 25px; }
+
+.input_message {
+  margin-left: 0px; margin-right: 0px; width: 448px;
+  margin-bottom: 10px;  
+}
+.button_submitmsg {
+  height: 35px;
+  width: 100px;
+}
 
 .welcome { float:left; }
 
@@ -73,8 +82,8 @@ a {
     <div id="chatbox"></div>
 
     <form name="message" action="" >
-        <input name="message" type="text" id="message" size="63" />
-        <input name="submitmsg" type="button" onclick="sendChat()" id="submitmsg" value="Send" />
+        <textarea name="message" class="input_message" id="message" size="63"></textarea>
+        <input name="submitmsg" class="button_submitmsg" type="button" onclick="sendChat()" id="submitmsg" value="Send" />
     </form>
 </div>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js"></script>
