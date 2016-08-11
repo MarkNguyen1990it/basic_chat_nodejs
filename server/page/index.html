@@ -1,117 +1,149 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<style>
-/* CSS Document */
-body {
-  font:12px arial;
-  color: #222;
-  text-align:center;
-  padding:35px; }
 
-form, p, span {
-  margin:0;
-  padding:0; }
-
-input { font:12px arial; }
-
-a {
-  color:#0000FF;
-  text-decoration:none; }
-
-  a:hover { text-decoration:underline; }
-
-#wrapper, #loginform {
-  margin:0 auto;
-  padding-bottom:25px;
-  background:#E1E8EF;
-  width:504px;
-  border:1px solid #ccc; }
-
-#loginform { padding-top:18px; }
-
-#loginform p { margin: 5px; }
-
-#chatbox {
-  text-align:left;
-  margin:0 auto;
-  margin-bottom:25px;
-  padding:10px;
-  background:#fff;
-  height:270px;
-  width:430px;
-  border:1px solid #ccc;
-  overflow:auto; }
-
-#usermsg {
-  width:395px;
-  border:1px solid #ccc; }
-
-#submit { width: 60px; }
-
-.error { color: #ff0000; }
-
-#menu { padding:12.5px 25px 12.5px 25px; }
-
-.input_message {
-  margin-left: 0px; margin-right: 0px; width: 448px;
-  margin-bottom: 10px;  
-}
-.button_submitmsg {
-  height: 35px;
-  width: 100px;
-}
-
-.welcome { float:left; }
-
-.logout { float:right; }
-
-.msgln { margin:0 0 2px 0; }
-</style>
-<html xmlns="www.marknguyen.com">
-
+<html>
 <head>
-    <title>Chat - Customer Module</title>
+    <style>
+        body {}
+        .roomsContainer {
+            float:left;
+            width:100px;
+            border-right:1px solid black;
+            height:300px;
+            padding:10px;
+            overflow:scroll-y;
+        }
+        .conversationContainer {
+            float:left;
+            width:300px;
+            height:250px;
+            overflow:scroll-y;
+            padding:10px;
+        }
+        #data {
+
+        }
+    </style>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+    <script>
+        //Will be adding CHATROOM LOGIC HERE
+        //We have Server Side funtions, now we need to add client side functions
+        var socket = io.connect('http://10.20.17.62:3000');
+
+        socket.on('connect', function() {
+            if(!localStorage.getItem("addUser")){
+              var addUser = prompt("What's your name");
+              localStorage.setItem("addUser",addUser);
+              socket.emit('addUser', addUser);
+
+            }else{
+              var addUser=localStorage.getItem("addUser");
+              socket.emit('addUser', addUser);
+            }
+        });
+
+        socket.on('updateChat', function(username, data) {
+            $('#conversation').append('<b>' + username + ':</b> ' + data + '<br>');
+        });
+
+        socket.on('updateRooms', function(rooms, currentRoom,fullDataRoom) {
+            $('#rooms').empty();
+            $.each(rooms, function(key, value) {
+                if(value === currentRoom) {
+                    $('#rooms').append('<div>'
+                    + value
+                    + '</div>');
+                }else {
+                    $('#rooms').append('<div><a href="#" onclick="switchRoom(\''+ value + '\')">'
+                     + value
+                     + '</a></div>');
+                }
+            });
+            $('#rooms').append('<div><a href="#" onclick="addRoom()"> Add </a></div>');
+            if(fullDataRoom[currentRoom]){
+              $.each(fullDataRoom[currentRoom], function(key, item) {
+                $('#conversation').append('<b>' + item.username + ':</b> ' + item.data + '<br>');
+              });
+            }
+        });
+
+        function switchRoom(room) {
+            $('#conversation').html("");
+            socket.emit('switchRoom', room);
+        }
+
+        function addRoom(){
+          socket.emit('addRoom');
+        }
+
+        //when the page loads we need to do a few things
+        $(function() {
+            //get sent data on click
+            $('#datasend').click( function() {
+                var message = $('#data').val();
+                //clear the input box
+                $('#data').val('');
+                $('#data').focus();
+                //send it to the server
+                socket.emit('sendChat', message);
+            });
+
+            //allow the client to use enter key
+            $('#data').keypress(function(e) {
+                if(e.which == 13) {
+                    $(this).blur();
+                    //select the send box
+                    $('#datasend').focus().click();
+                    //Select the input box
+                    $('#data').focus();
+                }
+            });
+
+        });
+
+    </script>
 
 </head>
-<script type="text/javascript" src="http://localhost:9001/socket.io/socket.io.js"></script>
-<div id="wrapper">
-    <div id="menu">
-        <p class="welcome">Welcome,<input name="name" type="text" id="name" size="63" /><b></b></p>
-        <div style="clear:both"></div>
-    </div>
-
-    <div id="chatbox"></div>
-
-    <form name="message" action="" >
-        <textarea name="message" class="input_message" id="message" size="63"></textarea>
-        <input name="submitmsg" class="button_submitmsg" type="button" onclick="sendChat()" id="submitmsg" value="Send" />
-    </form>
+<body>
+<div class="roomsContainer">
+	<b>ROOMS</b>
+	<div id="rooms"></div>
 </div>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js"></script>
-<script type="text/javascript">
-    $(document).ready(function() {
-      $(window).keydown(function(event){
-        if(event.keyCode == 13) {
-          sendChat();
-          return false;
-        }
-      });
-    });
-    var socket=io.connect('http://localhost:9001');
-    function sendChat() {
-      var infomation={}
-      infomation["name"]=$("#name").val();
-      infomation["message"]=$("#message").val();
-      socket.emit("input",infomation);
-      $("#message").val("");
-    }
-    socket.on('output', function (data) {
-     var message="</br>"+data["name"]+": "+data["message"];
-     $("#chatbox").append(message);
-     var objDiv = document.getElementById("chatbox");
-     objDiv.scrollTop = objDiv.scrollHeight;
-     console.log(data);
-    });
-</script>
-</body>
+<div class="conversationContainer">
+	<div id="conversation"></div>
+	<input id="data" style="width:200px;" />
+	<input type="button" id="datasend" value="send" />
+</div>
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse">
+    <tbody>
+        <tr>
+            <td valign="top" style="padding:9px">
 
+
+                <table align="left" border="0" cellpadding="0" cellspacing="0" width="false" style="border-collapse:collapse">
+                    <tbody>
+                        <tr>
+                            <td align="center" valign="top" style="padding:0 9px 9px 9px">
+
+
+                                <a href="http://livecoding.us10.list-manage.com/track/click?u=d85f426ccb6ac7f58a24f8326&amp;id=3ca0c616af&amp;e=81ec2d6908" title="" target="_blank">
+
+
+                                    <img alt="Meme GIF" src="https://ci5.googleusercontent.com/proxy/MLP1QqIqmEEXbfn6lYHBfhSY9Y28Zpqn34gJkwX_iSAwmRVjw63MifceJLXsUXbq8RMmlLa1hrlPYV0C_bEpxbuTnEQgbYBaTRLe4zeXtYigp_Rhzmmu7obBF_9sMFL6Xces5OeaBSI-1bkbSDUdDhGiJ-7zx0JWUOqy7rM=s0-d-e1-ft#https://gallery.mailchimp.com/d85f426ccb6ac7f58a24f8326/images/54d50a52-61ea-43c5-83bf-6608ea184752.gif"
+                                        width="320" style="max-width:320px;border:0;min-height:auto;outline:none;text-decoration:none;vertical-align:bottom" class="CToWUd">
+                                </a>
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" style="padding:0px 9px;line-height:125%;text-align:center;word-break:break-word;color:#22282e;font-family:Helvetica;font-size:16px" width="564">
+                                When your boss tells your team to merge Git branches <span class="aBn" data-term="goog_997956615" tabindex="0"><span class="aQJ">on Friday</span></span> one hour before close of business
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </tbody>
+</table>
+</body>
 </html>
