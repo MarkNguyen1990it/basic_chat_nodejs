@@ -1,4 +1,4 @@
-# Angular JS Project
+#  JS Project
 
 #### Requirement:
 Node.js
